@@ -1,0 +1,15 @@
+{
+  "name": "fixaa-automation-platform",
+  "version": "1.0.0",
+  "description": "منصة أتمتة شركة فيكساا عرب",
+  "main": "index.html",
+  "dependencies": {
+    "@google/generative-ai": "^0.11.4"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test case\" && exit 1"
+  },
+  "author": "Marwan - Fixaa Arab",
+  "license": "ISC"
+}

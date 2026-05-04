@@ -2,74 +2,180 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>Fixaa AI Chat</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fixaa AI Chat | منصة أتمتة فيكساا</title>
     <style>
-        /* ستايل شركة فيكساا عرب - Matte Black & Cinematic */
+        /* ستايل فيكساا عرب - Matte Black & Professional Look */
+        :root {
+            --bg-color: #0a0a0a;
+            --container-bg: #141414;
+            --accent-color: #007bff;
+            --text-color: #e5e5e5;
+            --border-color: #2a2a2a;
+        }
+
         body {
-            background-color: #121212;
-            color: #e0e0e0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             height: 100vh;
             margin: 0;
+            overflow: hidden;
         }
+
+        .chat-header {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .chat-header h1 {
+            font-size: 1.5rem;
+            letter-spacing: 1px;
+            color: #fff;
+            margin: 0;
+        }
+
         #chat-container {
-            width: 400px;
-            height: 500px;
-            background: #1e1e1e;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            width: 90%;
+            max-width: 450px;
+            height: 60vh;
+            background: var(--container-bg);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
             display: flex;
             flex-direction: column;
-            overflow: hidden;
-            border: 1px solid #333;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.7);
         }
+
         #messages {
             flex: 1;
             padding: 20px;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
+            gap: 15px;
+        }
+
+        /* تنسيق الرسائل */
+        .message {
+            padding: 12px 16px;
+            border-radius: 15px;
+            font-size: 0.95rem;
+            line-height: 1.4;
+            max-width: 80%;
+            word-wrap: break-word;
+        }
+
+        .user {
+            background: #222;
+            align-self: flex-start;
+            border-bottom-right-radius: 2px;
+        }
+
+        .ai {
+            background: var(--accent-color);
+            color: white;
+            align-self: flex-end;
+            border-bottom-left-radius: 2px;
+        }
+
+        #input-area {
+            display: flex;
+            padding: 15px;
+            background: #111;
+            border-top: 1px solid var(--border-color);
             gap: 10px;
         }
-        .message { padding: 10px; border-radius: 10px; max-width: 80%; }
-        .user { background: #333; align-self: flex-start; }
-        .ai { background: #0056b3; align-self: flex-end; }
-        #input-area { display: flex; padding: 15px; background: #181818; gap: 10px; }
+
         input {
             flex: 1;
-            background: #252525;
-            border: none;
-            padding: 10px;
-            border-radius: 5px;
+            background: #1a1a1a;
+            border: 1px solid var(--border-color);
+            padding: 12px;
+            border-radius: 8px;
             color: white;
             outline: none;
+            transition: 0.3s;
         }
+
+        input:focus { border-color: var(--accent-color); }
+
         button {
-            background: #444;
+            background: var(--accent-color);
             color: white;
             border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
+            padding: 0 20px;
+            border-radius: 8px;
+            font-weight: bold;
             cursor: pointer;
             transition: 0.3s;
         }
-        button:hover { background: #666; }
+
+        button:hover { opacity: 0.8; }
+
+        /* Scrollbar Style */
+        #messages::-webkit-scrollbar { width: 5px; }
+        #messages::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
     </style>
 </head>
 <body>
-    <h2>Fixaa AI 🤖</h2>
+
+    <div class="chat-header">
+        <h1>FIXAA AI 🤖</h1>
+        <small style="color: #666;">منصة الأتمتة والذكاء الاصطناعي</small>
+    </div>
+
     <div id="chat-container">
         <div id="messages"></div>
         <div id="input-area">
-            <input type="text" id="userInput" placeholder="اسأل جيمناي...">
+            <input type="text" id="userInput" placeholder="اسأل جيمناي أي شيء...">
             <button onclick="sendMessage()">إرسال</button>
         </div>
     </div>
 
-    <script src="app.js"></script>
+    <script>
+        async function sendMessage() {
+            const input = document.getElementById('userInput');
+            const messagesDiv = document.getElementById('messages');
+            const text = input.value.trim();
+
+            if (!text) return;
+
+            // إضافة رسالة المستخدم
+            messagesDiv.innerHTML += `<div class="message user">${text}</div>`;
+            input.value = '';
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+            try {
+                // ملاحظة هامة: استبدل الرابط أدناه برابط الـ Netlify الخاص بمشروعك الجديد
+                const response = await fetch('/.netlify/functions/handler', {
+                    method: 'POST',
+                    body: JSON.stringify({ prompt: text }),
+                    headers: { 'Content-Type': 'application/json' }
+                });
+
+                const data = await response.json();
+                
+                if (data.message) {
+                    messagesDiv.innerHTML += `<div class="message ai">${data.message}</div>`;
+                } else {
+                    throw new Error(data.error || "خطأ مجهول");
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                messagesDiv.innerHTML += `<div class="message ai" style="background: #ff4444;">عذرًا، حدث خطأ في الاتصال!</div>`;
+            }
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        // إرسال الرسالة عند الضغط على Enter
+        document.getElementById('userInput').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') sendMessage();
+        });
+    </script>
 </body>
 </html>
